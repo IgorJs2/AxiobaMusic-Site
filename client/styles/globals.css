@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Rubik;
+}
+
+html{
+    background-color: #6093C1 !important;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+body{
+    @apply bg-blue min-h-screen
+}
+
+.active{
+    @apply bg-light_blue
+}
+
+tr{
+    background-color: #5380AA !important;
+    @apply text-white my-4
+}
+
+tbody tr{
+    border-width: 2px;
+    @apply border-light_blue hover:cursor-pointer
+}
+
+
+td{
+    background-color: #5380AA !important;
+    @apply border-none text-white text-center  h-24
+}
+
+th h1{
+    @apply my-4
+}
+
+li{
+    color: white !important;
+}
+

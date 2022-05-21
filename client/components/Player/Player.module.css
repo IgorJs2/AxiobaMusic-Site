@@ -1,0 +1,15 @@
+
+.player {
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    text-align: center;
+    justify-content: left;
+    align-items: center;
+    padding: 0 10px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background-color: #5380AA;
+}
