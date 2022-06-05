@@ -8,6 +8,7 @@ import { FavoriteModule } from './favorite/favorite.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import * as path from "path"
+import {AppController} from "./app.controller";
 
 require('dotenv').config()
 
@@ -18,7 +19,8 @@ require('dotenv').config()
         MongooseModule.forRoot(process.env.MongoURI),
         TrackModule, AlbumModule, FileModule, FavoriteModule, UserModule, AuthModule
     ],
-    providers: []
+    providers: [],
+    controllers: [AppController],
 })
 export class AppModule {
 

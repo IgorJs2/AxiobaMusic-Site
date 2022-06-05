@@ -1,6 +1,7 @@
-import {Body, Controller, Get, Param, Post, Req, Res} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Query, Req, Res, UseGuards} from '@nestjs/common';
 import {FavoriteService} from "./favorite.service";
-import {getCookies} from "cookies-next";
+import addFavoriteDto from "./dto/addFavoriteDto"
+import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @Controller('/favorite')
 export class FavoriteController {
@@ -8,11 +9,17 @@ export class FavoriteController {
     constructor(private favoriteService: FavoriteService) {
     }
 
-    @Get(":favorite")
-    async getFavorite(@Param("favorite") favorite: string){
-        const idArray = JSON.parse(favorite)
-        return await this.favoriteService.getFavorite(idArray)
+    @UseGuards(JwtAuthGuard)
+    @Get(":id")
+    async getFavorite(@Param("id") id: string) {
+        return await this.favoriteService.getFavorite(id)
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Post()
+    async setFavorite(@Body() dto: addFavoriteDto) {
+        const arrayId = JSON.parse(dto.arrayId)
+        return await this.favoriteService.setFavorite(dto.userId, arrayId)
+    }
 
 }

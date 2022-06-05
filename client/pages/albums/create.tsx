@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {useRouter} from "next/router";
 import CustomStepper from "../../components/CustomStepper/CustomStepper";
 import {Button, Form, Input, InputGroup, Select, Textarea} from "react-daisyui";
@@ -7,8 +7,17 @@ import MainLayouts from "../../layouts/MainLayouts";
 import {useInput} from "../../hooks/useInput";
 import axios from "axios";
 import CustomSelect from "../../components/CustomsSelect/CustomSelect";
+import {getCookie} from "cookies-next";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import {GetServerSideProps} from "next";
+import {profile} from "../../components/UserWindow/UserWindow";
 
-const Create = () => {
+type CreateT = {
+    token: string,
+    profile: profile
+}
+
+const Create: FC<CreateT> = ({token,profile}) => {
     const router = useRouter()
 
     const username = useInput("")
@@ -66,9 +75,16 @@ const Create = () => {
 
     const submitHandler = () => {
         const formData = new FormData()
+        const config = {
+            "headers": {
+                //@ts-ignore
+                "Authorization": `Bearer ${JSON.parse(getCookie("token"))}`
+            }
+        };
         formData.append('username', username.value)
         formData.append('group', group.value)
         formData.append('name', name.value)
+        // @ts-ignore
         formData.append('image', Picture)
         formData.append('artists', "")
         formData.append('names', "")
@@ -79,16 +95,8 @@ const Create = () => {
                 formData.set("names", formData.get("names") + " " + elem.name.split(" ").join("@!"))
             }
         })
-        axios.post("http://localhost:5000/album", formData).then(res => {router.push("/albums")}).catch(e => console.log(e))
+        axios.post("http://localhost:5000/album", formData, config).then(res => {router.push("/albums")}).catch(e => console.log(e))
     }
-
-    const chooseFileHandler = (event: Event): void => {
-        const target = event.target as HTMLInputElement;
-        if (target.files && target.files.length) {
-            setPicture(target.files[0])
-        }
-    }
-
     const tracksHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
         const name = e.target.name
@@ -105,8 +113,12 @@ const Create = () => {
         setTracks([...result])
     }
 
+    if(!token){
+        return (<MainLayouts token={""}><div className="m-4"><ErrorMessage error={"Unatorized"} /></div></MainLayouts>)
+    }
+
     return (
-        <MainLayouts>
+        <MainLayouts token={token} profile={profile}>
             <div className="w-full h-fit">
                 <div className="w-4/6 mx-auto my-10 h-fit flex flex-row justify-center items-center text-center">
                     <CustomStepper currentStep={ActiveForm}/>
@@ -178,7 +190,7 @@ const Create = () => {
                                                         <h1 className="w-1/6 text-white text-2xl rounded-2xl p-2 bg-blue">{i + 1}</h1>
                                                         <Input type="text" data-number={i} name={"name"} onChange={tracksHandler} placeholder="Name of track" className="w-2/6 text-white bg-blue rounded-2xl border-none placeholder-white mx-auto"/>
                                                         <Input type="text" data-number={i} name={"artist"} onChange={tracksHandler} placeholder="Artist" className=" w-2/6 text-white bg-blue rounded-2xl border-none placeholder-white mx-auto"/>
-                                                        <FileUpload setFiles={setAudio} accept="audio/">{!(Audio) || Audio[i] == undefined ? (<Button>Upload Audio</Button>) : (<Button disabled="true">Uploaded</Button>)}</FileUpload>
+                                                        <FileUpload setFiles={setAudio} accept="audio/">{!(Audio) || Audio[i] == undefined ? (<Button>Upload Audio</Button>) : (<Button disabled={true}>Uploaded</Button>)}</FileUpload>
                                                     </div>
                                                 )
                                             }
@@ -202,3 +214,33 @@ const Create = () => {
 }
 
 export default Create;
+
+//@ts-ignore
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+    try {
+        const cookie = getCookie("token", {req, res})
+        if (typeof cookie === "string") {
+            const token = JSON.parse(cookie)
+            const config = {
+                "headers": {
+                    "Authorization": `Bearer ${token}`
+                }
+            };
+            const profile = await axios.get("http://localhost:5000/user/profile", config)
+            if(profile){
+                return{
+                    props: {token: token, profile: profile.data}
+                }
+            }
+        }
+        return{
+            props: {token: "", profile: {username: ""}}
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            props: {token: ""},
+        }
+    }
+
+}

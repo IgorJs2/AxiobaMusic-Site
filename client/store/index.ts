@@ -8,6 +8,6 @@ import { legacy_createStore as createStore} from 'redux'
 const makeStore: MakeStore<RootState> = (context: Context) => createStore(reducer, applyMiddleware(thunk));
 
 // @ts-ignore
-export const wrapper = createWrapper<RootState>(makeStore, {debug: true});
+export const wrapper = createWrapper<RootState>(makeStore, {debug: false});
 
 export type NextThunkDispatch = ThunkDispatch<RootState, void, AnyAction>

@@ -8,19 +8,29 @@ import AlbumTrack from "../../components/AlbumTrack/AlbumTrack";
 import {IAlbum} from "../../types/album";
 import axios from "axios";
 import {GetServerSideProps} from "next";
+import {getCookie} from "cookies-next";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import {profile} from "../../components/UserWindow/UserWindow";
 
 type AlbumIdProps = {
-    album: IAlbum
+    album: IAlbum,
+    token: string,
+    profile: profile
 }
 
-const Info: FC<AlbumIdProps> = ({album}) => {
+const Info: FC<AlbumIdProps> = ({album, token,profile}) => {
 
     const router = useRouter()
 
 
+    if(!token){
+        return (<MainLayouts token={""}><div className="m-4"><ErrorMessage error={"Unatorized"} /></div></MainLayouts>)
+    }
+
+
     return (
 
-        <MainLayouts>
+        <MainLayouts token={token} profile={profile}>
 
             <Button className="m-10" onClick={() => {
                 router.push("/albums")
@@ -58,13 +68,30 @@ const Info: FC<AlbumIdProps> = ({album}) => {
 
 export default Info;
 
-export const getServerSideProps: GetServerSideProps = async ({params}) =>{
+export const getServerSideProps: GetServerSideProps = async ({params, req, res}) => {
+    const token = (getCookie("token", {req, res}) || "")
+    if(token && typeof token === "string"){
+        const config = {
+            "headers": {
+                "Authorization": `Bearer ${JSON.parse(token)}`
+            }
+        };
+        const addListen = await axios.get("http://localhost:5000/album/listen/" + params?.id, config)
+        const response = await axios.get("http://localhost:5000/album/" + params?.id, config)
+        const profile = await axios.get("http://localhost:5000/user/profile", config)
+        return {
+            props: {
+                album: response.data,
+                token: JSON.parse(token),
+                profile: profile.data
+            }
+        }
+    }
 
-    const addListen = await axios.get("http://localhost:5000/album/listen/" + params?.id)
-    const response = await axios.get("http://localhost:5000/album/" + params?.id)
-    return{
+    return {
         props: {
-            album: response.data
+            serverTrack: null,
+            token: ""
         }
     }
 }

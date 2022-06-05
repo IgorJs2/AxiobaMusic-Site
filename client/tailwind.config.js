@@ -8,6 +8,7 @@ module.exports = {
       pattern: /./
     },
   ],
+  important: true,
   theme: {
     extend: {},
     colors: {

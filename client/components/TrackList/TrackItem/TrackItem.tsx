@@ -13,7 +13,7 @@ interface TrackItemProps {
 
 const TrackItem: FC<TrackItemProps> = ({elem, i, active, flag}) => {
     const router = useRouter()
-    const {setCookie, checkFavorite} = useCookie()
+    const {setCookieForFavorite, checkFavorite} = useCookie()
     const {set_Active} = useAction()
 
     useEffect(() => {checkFavorite()},)
@@ -27,7 +27,7 @@ const TrackItem: FC<TrackItemProps> = ({elem, i, active, flag}) => {
     const setFavorite = (e: any) => {
         e.stopPropagation()
         const id = e.target.getAttribute("data-id")
-        setCookie(id)
+        setCookieForFavorite(id)
     }
 
 

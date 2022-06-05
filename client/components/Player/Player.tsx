@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import styles from "./Player.module.css"
-import {Badge, Button, Progress, Range} from "react-daisyui";
 import {useTypeSelector} from "../../hooks/useTypeSelector";
 import {useAction} from "../../hooks/useAction";
 
@@ -44,12 +43,16 @@ const Player = () => {
     }
 
     const changeVolume = (e: React.ChangeEvent) => {
+        // @ts-ignore
         audio.volume = Number(e.target.value) / 100
+        // @ts-ignore
         set_Volume(Number(e.target.value))
     }
 
     const changeCurrentTime = (e: React.ChangeEvent) => {
+        // @ts-ignore
         audio.currentTime = Number(e.target.value)
+        // @ts-ignore
         set_Current_Time_Track(Number(e.target.value))
     }
 

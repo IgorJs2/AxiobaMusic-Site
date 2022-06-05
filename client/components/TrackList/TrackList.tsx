@@ -2,9 +2,9 @@ import React, {FC} from 'react';
 import {ITrack} from "../../types/track";
 import TrackItem from "./TrackItem/TrackItem";
 
-interface TrackListProps {
+type TrackListProps = {
     tracks: ITrack[],
-    flag: string | undefined,
+    flag?: string
 }
 
 const TrackList: FC<TrackListProps> = ({tracks, flag}) => {

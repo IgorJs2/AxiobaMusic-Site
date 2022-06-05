@@ -2,49 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
+@font-face {
+    font-family: 'Rubik';
+    src: url('../assets/fonts/Rubik-Light.ttf');
+}
+
+* {
     margin: 0;
     padding: 0;
     font-family: Rubik;
 }
 
-html{
+html {
     background-color: #6093C1 !important;
 }
 
-textarea:focus, input:focus{
+textarea:focus, input:focus {
     outline: none;
 }
 
-body{
+body {
     @apply bg-blue min-h-screen
 }
 
-.active{
+.active {
     @apply bg-light_blue
 }
 
-tr{
+tr {
     background-color: #5380AA !important;
     @apply text-white my-4
 }
 
-tbody tr{
+tbody tr {
     border-width: 2px;
     @apply border-light_blue hover:cursor-pointer
 }
 
 
-td{
+td {
     background-color: #5380AA !important;
     @apply border-none text-white text-center  h-24
 }
 
-th h1{
+th h1 {
     @apply my-4
 }
 
-li{
+li {
     color: white !important;
 }
+
 

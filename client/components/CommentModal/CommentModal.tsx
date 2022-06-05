@@ -3,6 +3,7 @@ import {Badge, Button, Divider, Input, Menu, Modal, Textarea} from "react-daisyu
 import {useInput} from "../../hooks/useInput";
 import axios from "axios";
 import {ITrack} from "../../types/track";
+import {getCookie} from "cookies-next";
 
 type Props = {
     visible: boolean,
@@ -20,11 +21,17 @@ const CommentModal: FC<Props> = ({visible, onClick, track, setTrack}) => {
     const text = useInput("")
 
     const submitHandler = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        const config = {
+            "headers": {
+                // @ts-ignore
+                "Authorization": `Bearer ${JSON.parse(getCookie("token").toString())}`
+            }
+        };
         const response = await axios.post("http://localhost:5000/track/comment", {
             username: username.value,
             text: text.value,
             trackId: track._id
-        })
+        }, config)
         setTrack({...track, comments: [...track.comments, response.data]})
     }
 

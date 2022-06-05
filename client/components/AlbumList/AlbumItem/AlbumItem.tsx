@@ -12,14 +12,14 @@ type AlbumItem = {
 
 const AlbumItem: FC<AlbumItem> = ({album, flag}) => {
     const router = useRouter()
-    const {setCookie, checkFavorite} = useCookie()
+    const {setCookieForFavorite, checkFavorite} = useCookie()
 
     useEffect(() => {checkFavorite()})
 
     const setFavorite = (e: any) => {
         e.stopPropagation()
         const id = e.target.getAttribute("data-id")
-        setCookie(id)
+        setCookieForFavorite(id)
     }
 
 

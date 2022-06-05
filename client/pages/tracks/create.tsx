@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {useRouter} from "next/router";
 import MainNavbar from "../../components/MainNavbar/MainNavbar";
 import CustomStepper from "../../components/CustomStepper/CustomStepper";
@@ -7,8 +7,17 @@ import FileUpload from "../../components/FileUpload/FileUpload";
 import MainLayouts from "../../layouts/MainLayouts";
 import {useInput} from "../../hooks/useInput";
 import axios from "axios";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import {getCookie} from "cookies-next";
+import {GetServerSideProps} from "next";
+import {profile} from "../../components/UserWindow/UserWindow";
 
-const Create = () => {
+type CreateT = {
+    token: string,
+    profile: profile
+}
+
+const Create: FC<CreateT> = ({token, profile}) => {
     const router = useRouter()
 
     const name = useInput("")
@@ -27,10 +36,16 @@ const Create = () => {
         formData.append('name', name.value)
         formData.append('artist', artist.value)
         formData.append('text', text.value)
+        // @ts-ignore
         formData.append('image', Picture)
+        // @ts-ignore
         formData.append('audio', Audio)
-
-        axios.post("http://localhost:5000/track", formData).then((res) => router.push("/tracks")).catch(e => console.log(e))
+        const config = {
+            "headers": {
+                "Authorization": `Bearer ${token}`
+            }
+        };
+        axios.post("http://localhost:5000/track", formData, config).then((res) => router.push("/tracks")).catch(e => console.log(e))
     }
 
     useEffect(() => {
@@ -51,20 +66,12 @@ const Create = () => {
         }
     }, [Picture, Audio])
 
-    const chooseFileHandler = (event: Event): void => {
-        const target = event.target as HTMLInputElement;
-        if (target.files && target.files.length) {
-            if(ActiveForm === 2){
-                setPicture(target.files[0])
-            }
-            else{
-                setAudio(target.files[0])
-            }
-        }
+    if(!token){
+        return (<MainLayouts token=""><div className="m-4"><ErrorMessage error={"Unatorized"} /></div></MainLayouts>)
     }
 
 return (
-    <MainLayouts>
+    <MainLayouts token={token} profile={profile}>
     <div className="w-full h-fit">
         <div className="w-4/6 mx-auto my-10 h-fit flex flex-row justify-center items-center text-center">
             <CustomStepper currentStep={ActiveForm}/>
@@ -146,3 +153,32 @@ return (
 }
 
 export default Create;
+
+// @ts-ignore
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+    try {
+        const cookie = getCookie("token", {req, res})
+        if (typeof cookie === "string") {
+            const token = JSON.parse(cookie)
+            const config = {
+                "headers": {
+                    "Authorization": `Bearer ${token}`
+                }
+            };
+            const profile = await axios.get("http://localhost:5000/user/profile", config)
+            if(profile){
+                return{
+                    props: {token: token, profile: profile.data}
+                }
+            }
+        }
+        return{
+            props: {token: "", profile: {username: ""}}
+        }
+    } catch (e) {
+        return {
+            props: {token: "", profile: {username: ""}},
+        }
+    }
+
+}

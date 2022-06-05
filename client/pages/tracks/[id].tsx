@@ -6,12 +6,17 @@ import MainLayouts from '../../layouts/MainLayouts';
 import {GetServerSideProps} from "next";
 import axios from "axios";
 import {ITrack} from "../../types/track";
+import {getCookie} from "cookies-next";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import {profile} from "../../components/UserWindow/UserWindow";
 
 type TrackIdProps = {
-    serverTrack: ITrack
+    serverTrack: ITrack,
+    token: string,
+    profile: profile
 }
 
-const Info: FC<TrackIdProps> = ({serverTrack}) => {
+const Info: FC<TrackIdProps> = ({serverTrack, token, profile}) => {
 
 
     const [track, setTrack] = useState<ITrack>(serverTrack)
@@ -23,9 +28,14 @@ const Info: FC<TrackIdProps> = ({serverTrack}) => {
         setVisible(!visible)
     }
 
+    if(!token){
+        return (<MainLayouts token={""}><div className="m-4"><ErrorMessage error={"Unatorized"} /></div></MainLayouts>)
+    }
+
+
     return (
 
-        <MainLayouts>
+        <MainLayouts token={token} profile={profile}>
 
             <Button className="m-10" onClick={() => {
                 router.push("/tracks")
@@ -70,13 +80,31 @@ const Info: FC<TrackIdProps> = ({serverTrack}) => {
 
 export default Info;
 
-export const getServerSideProps: GetServerSideProps = async ({params}) =>{
+export const getServerSideProps: GetServerSideProps = async ({params, req, res}) => {
+    const token = (getCookie("token", {req, res}) || "")
+    if(token && typeof token === "string"){
+        const config = {
+            "headers": {
+                "Authorization": `Bearer ${JSON.parse(token)}`
+            }
+        };
+        const addListen = await axios.get("http://localhost:5000/track/listen/" + params?.id, config)
+        const response = await axios.get("http://localhost:5000/track/" + params?.id, config)
+        const profile = await axios.get("http://localhost:5000/user/profile", config)
+        return {
+            props: {
+                serverTrack: response.data,
+                token: JSON.parse(token),
+                profile: profile.data
+            }
+        }
+    }
 
-    const addListen = await axios.get("http://localhost:5000/track/listen/" + params?.id)
-    const response = await axios.get("http://localhost:5000/track/" + params?.id)
-    return{
+    return {
         props: {
-            serverTrack: response.data
+            serverTrack: null,
+            token: "",
+            profile: {username: ""}
         }
     }
 }
