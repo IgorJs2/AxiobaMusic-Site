@@ -1,34 +1,29 @@
-# AxiobaMusic-Site
-Site for listen and save music, create you own album and developed using Next | Nest | Mongodb | mongoose.js | Node.js | ES6 features
+# AxiobaMusic — Music Streaming Web App
 
-# Pre-reqs
-To build and run this app locally you will need a few things:
-- Install [Node.js](https://nodejs.org/en/)
-- Create [MongoDB] base in browser and get MongoURI(https://www.mongodb.com/)
-- Install [VS Code](https://code.visualstudio.com/)
+> [!WARNING]
+> **DEPRECATED — OLD LEARNING PROJECT (2022).** Archived and no longer maintained. Kept public to show my early progress.
+> For my current production work see [my GitHub profile](https://github.com/IgorJs2) — Metrocraft 2036 and Stalcraft LAB.
 
-# Getting started
-- Clone the repository
- 
-```
+A Spotify-inspired music site: listen to tracks, save favourites and build your own albums.
+
+## Features
+- Registration and login (Passport local + JWT, httpOnly cookies)
+- Track upload and playback
+- Personal library and custom albums
+- Server-side rendered UI
+
+## Tech stack
+| Layer | Technologies |
+|---|---|
+| Frontend | Next.js, React, TypeScript, Redux, Tailwind CSS, daisyUI |
+| Backend | NestJS, Passport, JWT, bcrypt |
+| Database | MongoDB, Mongoose |
+
+## Run locally
+```bash
 git clone https://github.com/IgorJs2/AxiobaMusic-Site.git
-```
-- Install dependencies
-
-```
+cd AxiobaMusic-Site
 npm run modules
-```
-
-- Go to /server/.env and set your MongoURI
-
-- Run client by command
-
-```
-npm run start:client
-```
-
-- Run server by command
-
-```
-npm run start:server
+# set MONGO_URI in server/.env
+npm run start
 ```
